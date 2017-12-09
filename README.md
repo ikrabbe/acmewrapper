@@ -1,3 +1,5 @@
+> **NOTE**: I recommend that new projects use the "official" acme library, [autocert](https://godoc.org/golang.org/x/crypto/acme/autocert). An example of usage can be seen [here](https://play.golang.org/p/Nas2lT_XeY).
+
 # ACMEWrapper
 
 Add Let's Encrypt support to your golang server in 10 lines of code.
