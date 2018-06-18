@@ -120,16 +120,8 @@ func (w *AcmeWrapper) initACME(serverRunning bool) (err error) {
 
 	if w.registration == nil {
 		// There is no registration - register with the ACME server
-		w.registration, err = w.client.Register()
+		w.registration, err = w.client.Register(true)
 		if err != nil {
-			return err
-		}
-
-		if !w.Config.TOSCallback(w.registration.TosURL) {
-			return errors.New("Terms of service were not accepted")
-		}
-
-		if err = w.client.AgreeToTOS(); err != nil {
 			return err
 		}
 
@@ -168,7 +160,7 @@ func (w *AcmeWrapper) initACME(serverRunning bool) (err error) {
 	// so that it uses our custom SNI provider. We don't want
 	// to start custom servers, but rather plug into our certificate updater once
 	// we are running. This allows cert updates to be transparent.
-	w.client.SetChallengeProvider(acme.TLSSNI01, &wrapperChallengeProvider{
+	w.client.SetChallengeProvider(acme.TLSALPN01, &wrapperChallengeProvider{
 		w: w,
 	})
 

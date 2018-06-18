@@ -65,7 +65,7 @@ func (w *AcmeWrapper) Renew() (err error) {
 	// TODO: In the future, figure out how to get renewals working with
 	// the information we have
 	cert, errmap := w.client.ObtainCertificate(w.Config.Domains, true, nil, false)
-	err = getCertError(errmap)
+	err = errmap
 
 	if err != nil {
 		// If it is not a TOS error, fail
@@ -75,32 +75,22 @@ func (w *AcmeWrapper) Renew() (err error) {
 
 		// There are new TOS
 
-		// TODO: update registration with new TOS
-		if !w.Config.TOSCallback(w.registration.TosURL) {
-			return errors.New("Did not accept new TOS")
-		}
-
-		err = w.client.AgreeToTOS()
-		if err != nil {
-			return err
-		}
-
 		// We agreed to new TOS. try again
 		cert, errmap = w.client.ObtainCertificate(w.Config.Domains, true, nil, false)
-		err = getCertError(errmap)
+		err = errmap
 		if err != nil {
 			return err
 		}
 	}
 
-	crt, err := tlsCert(cert)
+	crt, err := tlsCert(*cert)
 	if err != nil {
 		return err
 	}
 
 	// Write the certs to file if we are using file-backed stuff
 	if w.Config.TLSCertFile != "" {
-		w.writeCert(w.Config.TLSCertFile, w.Config.TLSKeyFile, cert)
+		w.writeCert(w.Config.TLSCertFile, w.Config.TLSKeyFile, *cert)
 	}
 
 	w.certmutex.Lock()
